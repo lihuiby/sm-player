@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>video player</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="mediaplayer" id="mediaplayer">
+    <h1>叮当狼3 殊死一战</h1>
+    <div class="video">
+        <video id="player">
+            <source src="E:\Downloads\ThunderDownload\test.mp4">
+            Video player not available.
+        </video>
+    </div>
+    <div id="controls" class="controls clearfix">
+        <a href="javascript:;" class="play ctrl-btn floatl icon-play3"></a>
+
+        <!-- 进度条 -->
+        <div class="progress floatl">
+            <div class="loaded"></div>
+        </div>
+
+        <!-- 时间 -->
+        <div class="timer floatl">
+            <span class="current">00:00:00</span> /
+            <span class="total">00:00:00</span>
+        </div>
+
+        <!-- 全屏 -->
+        <a href="javascript:;" class="full-screen ctrl-btn floatr icon-enlarge2"></a>
+
+        <!-- 音量 -->
+        <div class="volume floatr">
+            <a href="javascript:;" class="volume-btn ctrl-btn icon-volume-medium floatl"></a>
+            <div class="vol-progress">
+                <div class="vol-bar"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+window.onload = function(){
+    var mediaplayer = document.getElementById("mediaplayer");
+    var player = document.getElementById("player");
+    var controls = document.getElementById("controls");
+    var playBtn = controls.querySelector(".play");
+    var current = controls.querySelector(".current");
+    var total = controls.querySelector(".total");
+    var progress = controls.querySelector(".progress");
+    var loaded = controls.querySelector(".loaded");
+    var volProgress = controls.querySelector(".vol-progress");
+    var volBar = controls.querySelector(".vol-bar");
+    var volBtn = controls.querySelector(".volume-btn");
+    var fullScreen = controls.querySelector(".full-screen");
+    var currVol;
+
+
+    // 视频可以播放时
+    player.oncanplay = function(){
+        total.innerHTML = formatSeconds(this.duration);
+    };
+
+    player.onclick = playCtrl;
+    playBtn.onclick = playCtrl;
+
+    // 键盘操作
+    document.onkeydown = function(e){
+        var key = window.event ? e.keyCode : e.which;
+        currVol = player.volume;
+        if(key == 32){
+            e.preventDefault();
+            playCtrl();
+        }else if(key == 13){
+            fullScreenFn();
+        }else if(key == 37){
+            e.preventDefault();
+            player.currentTime -= 5;
+            if(player.currentTime < 0){
+                player.currentTime = 0;
+            }
+        }else if(key == 38){
+            e.preventDefault();
+            currVol += 0.1;
+            if(currVol > 1){
+                player.volume = 1;
+            }else{
+                player.volume = currVol.toFixed(1);
+            }
+
+        }else if(key == 39){
+            e.preventDefault();
+            player.currentTime += 5;
+            if(player.currentTime > player.duration){
+                player.currentTime = player.duration;
+            }
+
+        }else if(key == 40){
+            e.preventDefault();
+            currVol -= 0.1;
+            if(currVol < 0){
+                player.volume = 0;
+            }else {
+                player.volume = currVol.toFixed(1);
+            }
+        }
+    };
+
+    // 播放进度
+    player.ontimeupdate = function(){
+        var currentTime = this.currentTime;
+        var duration = this.duration;
+        loaded.style.width = currentTime / duration * 100 + "%";
+        current.innerHTML = formatSeconds(currentTime);
+    };
+
+    // 进度条点击
+    progress.onclick = function(e){
+        var event = e || window.event;
+        player.currentTime =(event.offsetX / this.offsetWidth) * player.duration;
+    };
+
+    // 音量变化
+    player.onvolumechange = function(){
+        volBar.style.width = this.volume * 100 + "%";
+        if(this.volume == 0){
+            volBtn.classList.remove("icon-volume-medium");
+            volBtn.classList.add("icon-volume-mute2");
+        }else{
+            volBtn.classList.remove("icon-volume-mute2");
+            volBtn.classList.add("icon-volume-medium");
+        }
+    };
+
+    // 音量按钮
+    volBtn.onclick = function(){
+        if(player.volume){
+            currVol = player.volume;
+            player.volume = 0;
+        }else{
+            player.volume = currVol;
+        }
+    };
+
+    // 音量进度条
+    volProgress.onclick = function(e){
+        var event = e || window.event;
+        player.volume =(event.offsetX / this.offsetWidth).toFixed(1);
+    };
+
+    // 全屏
+    fullScreen.onclick = fullScreenFn;
+
+    // 结束播放
+    player.onended = function(){
+//        var that = this;
+        //切换播放按钮状态
+        playBtn.classList.remove("icon-pause2");
+        playBtn.classList.add("icon-play3");
+        //进度条为0
+        loaded.style.width = 0;
+        //还原当前播放时间
+        current.innerHTML = formatSeconds();
+        //视频恢复到播放开始状态
+        this.currentTime = 0;
+    };
+
+    // 视频播放控制
+    function playCtrl(){
+        total.innerHTML = formatSeconds(player.duration);
+        if (player.paused){
+            player.play();
+            playBtn.classList.remove("icon-play3");
+            playBtn.classList.add("icon-pause2");
+        } else {
+            player.pause();
+            playBtn.classList.remove("icon-pause2");
+            playBtn.classList.add("icon-play3");
+        }
+    }
+
+    // 格式化时间
+    function formatSeconds(seconds) {
+        var h = parseInt(seconds/3600);
+        h = (h < 10) ? "0" + h : h;
+
+        var m = parseInt((seconds - h*3600) / 60);
+        m = (m < 10) ? "0" + m : m;
+
+        var s = parseInt((seconds - h*3600) % 60);
+        s = (s < 10) ? "0" + s : s;
+
+        var result = h + ":" + m + ":" + s;
+        if(seconds > 0){
+            return result;
+        }else{
+            return "00:00:00";
+        }
+
+    }
+
+
+    function launchFullscreen(element) { /* 判断各种浏览器，找到正确的方法*/
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        }
+    }
+
+    /* 判断浏览器种类*/
+    function exitFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+
+    function isFullScreen(){
+        if (document.fullScreen) {
+            return document.fullScreen;
+        } else if (document.mozFullScreen) {
+            return document.mozFullScreen;
+        } else if (document.webkitIsFullScreen) {
+            return document.webkitIsFullScreen;
+        }
+    }
+
+    function fullScreenFn(){
+        if (isFullScreen()) {
+            exitFullscreen();
+
+            mediaplayer.classList.remove("full");
+            fullScreen.classList.remove("icon-shrink2");
+            fullScreen.classList.add("icon-enlarge2");
+        } else {
+            launchFullscreen(mediaplayer);
+
+            mediaplayer.classList.add("full");
+            fullScreen.classList.remove("icon-enlarge2");
+            fullScreen.classList.add("icon-shrink2");
+        }
+    }
+
+};
+</script>
+</body>
+</html>
