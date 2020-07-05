@@ -101,11 +101,11 @@
 </div>
 <div id="videodiv" style="height:25%;width:auto;margin-top:13px;margin-left:10px;margin-right:10px;background:#16161A">
     <video id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"  width="" height="" data-setup='{}'>    
-        <source id="source" src="http://hls.cntv.lxdns.com/asp/hls/main/0303000a/3/default/978a64ddd3a1caa85ae70a23414e6540/main.m3u8"  type="application/x-mpegURL">
+        <source id="source" src="http://zm.icez.top/jxts/index.m3u8"  type="application/x-mpegURL">
     </video>
 <div>
 <div class="input-group my-3">
-    <input id="video-url" required="" name="play" type="text" class="form-control nice" placeholder="输入 地址" value="http://hls.cntv.lxdns.com/asp/hls/main/0303000a/3/default/978a64ddd3a1caa85ae70a23414e6540/main.m3u8" aria-describedby="button-addon2">
+    <input id="video-url" required="" name="play" type="text" class="form-control nice" placeholder="输入 地址" value="http://zm.icez.top/jxts/index.m3u8" aria-describedby="button-addon2">
     <div class="input-group-append">
         <button class="btn btn-dark js-play border-0" type="button" onclick="ChangeM3u8()">
 	<img src="img/play.png" height="24">
@@ -116,7 +116,7 @@
 <script>    
     if(IsPC()){
         document.getElementById('videodiv').style="margin:0 auto;height:88%;width:78%;margin-top:17px;"
-        document.getElementById('webhead').text += "(欢迎光临)"
+        document.getElementById('webhead').text += " (极限逃生) "
     }
     var play = QueryString('play')
     if(play != ''){
